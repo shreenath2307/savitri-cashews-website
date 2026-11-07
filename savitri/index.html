@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Savitri Cashews</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<script src="assets/js/gsap.min.js"></script>
+<script src="assets/js/ScrollTrigger.min.js"></script>
+<script src="assets/js/lenis.min.js"></script>
+<style>
+/* Layout concept: one long scroll. Ivory hero with a drifting leaf canopy, a pinned dark stage where the cashew video plays as you scroll,
+   then shop, a horizontal "tree to jar" track, factory facts, enquiry and visit. Single committed look: forest, sage, cashew, one red accent. */
+:root{
+  --forest:#14291c; --forest-2:#1d3a29; --leaf:#4f8a3a; --leaf-soft:#dfe9cf;
+  --sage:#eef1e0; --ivory:#f8f6ea; --bark:#4a3426; --nut:#e9c98e; --apple:#d9482b;
+  --ink:#1b2a20; --muted:#5d6b5e; --line:rgba(20,41,28,.14);
+  --display:"Playfair Display","Young Serif","Georgia","Times New Roman",serif; --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --gutter:max(16px,env(safe-area-inset-left,0px));
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{background:var(--ivory);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:hidden;
+  padding-left:0;padding-right:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--apple);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.btn{display:inline-flex;align-items:center;gap:.6em;padding:.95em 1.6em;border-radius:99px;font-weight:600;font-size:1rem;transition:transform .25s,background .25s,color .25s;white-space:nowrap}
+.btn-main{background:var(--apple);color:#fff}
+.btn-main:hover{transform:translateY(-3px) rotate(-1deg);background:#c13a1f}
+.btn-ghost{border:2px solid currentColor}
+.btn-ghost:hover{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
+.btn-leaf{background:var(--forest);color:var(--ivory)}
+.btn-leaf:hover{background:var(--leaf)}
+.kicker{font-weight:600;color:var(--leaf);font-size:.95rem;letter-spacing:.02em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* progress + preloader */
+#bar{position:fixed;left:0;top:0;height:4px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--leaf),var(--nut),var(--apple));z-index:200}
+#loader{position:fixed;inset:0;z-index:300;background:var(--forest);color:var(--ivory);display:grid;place-items:center;text-align:center;transition:opacity .6s,visibility .6s}
+#loader.done{opacity:0;visibility:hidden}
+#loader svg{width:120px;height:120px;animation:spin 6s linear infinite}
+#loader p{margin-top:16px;font-family:var(--display);font-size:1.3rem}
+#loader small{display:block;opacity:.7;font-size:.9rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* announcement */
+#ann{background:var(--forest);color:var(--nut);font-size:.9rem;font-weight:500;padding:9px max(16px,env(safe-area-inset-left,0px));text-align:center;position:relative}
+#ann button{position:absolute;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);padding:6px 10px;font-size:1.1rem;color:var(--ivory)}
+
+/* nav */
+header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:100;background:rgba(248,246,234,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:150;background:var(--ivory)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:72px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:1.35rem}
+.brand svg{width:46px;height:46px}
+.brand small{display:block;font-family:var(--body);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:-2px}
+.menu{display:flex;gap:26px;margin-left:auto;font-weight:600;font-size:.97rem}
+.menu a{position:relative;padding:6px 0}
+.menu a::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--apple);transform:scaleX(0);transform-origin:0 50%;transition:transform .3s}
+.menu a:hover::after{transform:scaleX(1)}
+.nav-actions{display:flex;gap:10px;align-items:center}
+#cartBtn{position:relative;display:inline-flex;align-items:center;gap:8px;padding:.7em 1.2em;border-radius:99px;background:var(--forest);color:var(--ivory);font-weight:600}
+#cartBtn b{background:var(--apple);border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;font-size:.8rem}
+#burger{display:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--forest)}
+#mobile{position:fixed;inset:0;z-index:90;background:var(--forest);color:var(--ivory);display:flex;flex-direction:column;justify-content:center;gap:14px;padding:0 max(24px,env(safe-area-inset-left,0px));transform:translateY(-100%);transition:transform .5s cubic-bezier(.7,0,.2,1)}
+#mobile.open{transform:none}
+#mobile a{font-family:var(--display);font-size:2.4rem}
+
+/* hero */
+.hero{position:relative;padding-block:56px 80px;overflow:hidden;background:radial-gradient(900px 500px at 85% 10%,var(--leaf-soft),transparent 70%),var(--ivory)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;position:relative;z-index:2}
+.hero h1{font-size:clamp(2.8rem,7vw,5.8rem)}
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.08em}
+.hero h1 .ln span{display:inline-block}
+.hero p.lead{font-size:1.2rem;max-width:34em;margin-top:24px;color:var(--muted)}
+.hero .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+.hero-pic{position:relative;aspect-ratio:1/1;max-width:560px;width:100%;justify-self:center}
+.blob{position:absolute;inset:0;background:#fff;border-radius:58% 42% 55% 45% / 48% 56% 44% 52%;overflow:hidden;box-shadow:0 40px 80px -30px rgba(20,41,28,.35);animation:morph 14s ease-in-out infinite}
+.blob img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;transform:scale(1.15)}
+@keyframes morph{50%{border-radius:42% 58% 45% 55% / 55% 45% 56% 44%}}
+.sticker{position:absolute;right:-2%;bottom:6%;width:128px;height:128px;border-radius:50%;background:var(--apple);color:#fff;display:grid;place-items:center;text-align:center;font-family:var(--display);font-size:1.05rem;line-height:1.1;transform:rotate(12deg);box-shadow:0 14px 30px -10px rgba(217,72,43,.6)}
+.leaf{position:absolute;pointer-events:none;z-index:1;opacity:.9}
+.leaf svg{display:block;width:100%;height:auto}
+
+/* marquee */
+.marq{background:var(--forest);color:var(--nut);overflow:hidden;white-space:nowrap;padding:18px 0;font-family:var(--display);font-size:1.7rem}
+.marq .tr{display:inline-flex;gap:0;animation:mq 30s linear infinite}
+.marq span{padding:0 28px}
+.marq i{font-style:normal;color:var(--apple)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* scrub stage */
+.stage{position:relative;height:100vh;height:100svh;background:#1a1109;color:#fff;overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,8,3,.72),rgba(14,8,3,.1) 62%),linear-gradient(0deg,rgba(14,8,3,.5),transparent 35%);pointer-events:none}
+.beats{position:absolute;inset:0;z-index:3;display:flex;align-items:center}
+.beat{position:absolute;left:0;right:0;opacity:0;pointer-events:none}
+.beat .wrap{max-width:1240px}
+.beat h2{font-size:clamp(2.2rem,5.4vw,4.6rem);max-width:11em;color:var(--ivory)}
+.beat p{max-width:28em;margin-top:18px;font-size:1.15rem;color:rgba(255,255,255,.85)}
+.beat .btn{pointer-events:auto;margin-top:26px}
+.hint{position:absolute;z-index:3;bottom:max(28px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);font-size:.85rem;color:rgba(255,255,255,.8);display:flex;flex-direction:column;align-items:center;gap:8px}
+.hint i{width:2px;height:34px;background:linear-gradient(var(--nut),transparent);animation:drip 1.6s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+#fcount{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:max(28px,env(safe-area-inset-bottom,0px));z-index:3;font-size:.8rem;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums}
+
+/* sections */
+section{position:relative}
+.sec{padding-block:110px}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:44px}
+.sec-head h2{font-size:clamp(2.2rem,5vw,4rem);max-width:12em}
+.sec-head p{max-width:26em;color:var(--muted)}
+
+/* shop */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+.tab{padding:.6em 1.2em;border-radius:99px;border:2px solid var(--line);font-weight:600;transition:.25s}
+.tab[aria-pressed="true"],.tab:hover{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+.card{background:#fff;border-radius:28px;padding:18px 18px 22px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);transition:transform .35s,box-shadow .35s}
+.card:hover{transform:translateY(-8px);box-shadow:0 30px 50px -28px rgba(20,41,28,.45)}
+.card .art{border-radius:20px;aspect-ratio:1/1.05;display:grid;place-items:center;overflow:hidden}
+.card .art svg{width:62%;height:auto;transition:transform .5s;filter:drop-shadow(0 18px 18px rgba(0,0,0,.22))}
+.card:hover .art svg{transform:rotate(-4deg) scale(1.06)}
+.card h3{font-size:1.4rem}
+.card .tag{font-size:.88rem;color:var(--muted);min-height:2.7em}
+.sizes{display:flex;gap:6px}
+.sizes button{flex:1;padding:.45em 0;border-radius:99px;border:1.5px solid var(--line);font-weight:600;font-size:.88rem}
+.sizes button[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.buy{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+.price{font-family:var(--display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.add{background:var(--forest);color:var(--ivory);padding:.6em 1.1em;border-radius:99px;font-weight:600;font-size:.92rem;transition:.25s}
+.add:hover{background:var(--apple)}
+.note{margin-top:22px;font-size:.85rem;color:var(--muted)}
+
+/* badges */
+.badges{background:var(--leaf-soft);padding-block:56px}
+.badges .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.badge{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.badge svg{width:54px;height:54px;color:var(--forest)}
+.badge b{font-family:var(--display);font-weight:400;font-size:1.3rem}
+.badge span{font-size:.95rem;color:var(--muted)}
+
+/* process */
+.process{background:var(--forest);color:var(--ivory);height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.process .head{padding-bottom:36px}
+.process h2{font-size:clamp(2.2rem,5vw,4rem)}
+.track{display:flex;gap:26px;padding-left:max(16px,calc((100vw - 1240px)/2 + 16px));padding-right:12vw;width:max-content;will-change:transform}
+.step{width:min(78vw,380px);flex:none;border-radius:30px;padding:28px;background:var(--forest-2);border:1px solid rgba(255,255,255,.1);position:relative;min-height:330px;display:flex;flex-direction:column;gap:12px}
+.step .n{font-family:var(--display);font-size:5rem;line-height:1;color:var(--nut);opacity:.9}
+.step h3{font-size:1.7rem}
+.step p{color:rgba(248,246,234,.78);font-size:.98rem}
+.step:nth-child(even){background:#244a33;transform:translateY(24px)}
+.pline{height:3px;background:rgba(255,255,255,.14);margin-top:34px;border-radius:3px;overflow:hidden}
+.pline i{display:block;height:100%;width:100%;background:var(--nut);transform-origin:0 50%;transform:scaleX(0)}
+
+/* grades */
+.grades{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.grade{padding:26px;border-radius:26px;background:var(--sage);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.grade b{font-family:var(--display);font-size:2.4rem;font-weight:400;color:var(--bark)}
+.grade .dots{display:flex;gap:4px;flex-wrap:wrap}
+.grade .dots i{width:20px;height:11px;border-radius:99px 99px 99px 99px/60% 60% 40% 40%;background:var(--nut);border:1.5px solid var(--bark);transform:rotate(-20deg)}
+.grade span{font-size:.93rem;color:var(--muted)}
+
+/* factory */
+.factory{background:var(--sage);overflow:hidden}
+.factory .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.factory .pic{aspect-ratio:4/5;border-radius:220px 220px 36px 36px;overflow:hidden;position:relative;background:#fff}
+.factory .pic img{position:absolute;left:0;top:-10%;width:100%;height:120%;object-fit:cover;mix-blend-mode:multiply;will-change:transform}
+.factory h2{font-size:clamp(2.2rem,4.6vw,3.8rem)}
+.factory p{margin-top:20px;color:var(--muted);max-width:32em}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px}
+.fact{background:#fff;border-radius:20px;padding:16px 18px;border:1px solid var(--line)}
+.fact b{font-family:var(--display);font-weight:400;font-size:1.25rem;display:block}
+.fact span{font-size:.9rem;color:var(--muted)}
+
+/* nutrition */
+.nut{background:var(--ivory)}
+.nut .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+.nut h2{font-size:clamp(2.2rem,4.6vw,3.8rem)}
+.nut .sub{margin-top:18px;color:var(--muted);max-width:26em}
+.bars{display:flex;flex-direction:column;gap:20px}
+.bar-row{display:grid;grid-template-columns:140px 1fr 76px;gap:14px;align-items:center;font-weight:600}
+.bar-row .t{height:16px;border-radius:99px;background:var(--leaf-soft);overflow:hidden}
+.bar-row .t i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--leaf),var(--nut));border-radius:99px;transform-origin:0 50%;transform:scaleX(0)}
+.bar-row em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
+
+/* recipes */
+.recipes{background:var(--sage)}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.rcard{background:#fff;border-radius:28px;padding:30px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line);transition:.35s;position:relative}
+.rcard:hover{transform:translateY(-6px) rotate(-.6deg)}
+.rcard .time{font-weight:600;color:var(--apple);font-size:.9rem}
+.rcard h3{font-size:1.7rem}
+.rcard ul{margin:0;padding-left:1.2em;color:var(--muted);font-size:.95rem;display:flex;flex-direction:column;gap:8px}
+.rcard ul li strong{color:var(--forest)}
+
+/* instagram */
+.insta .grid2{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.insta .grid2 a{aspect-ratio:1/1;border-radius:22px;overflow:hidden;position:relative;display:block;background:#2b1b0f}
+.insta .grid2 a img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.insta .grid2 a:hover img{transform:scale(1.12)}
+.insta .grid2 a::after{content:"@savitri__cashews";position:absolute;inset:auto 0 0;padding:26px 10px 10px;font-size:.78rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));opacity:0;transition:.3s}
+.insta .grid2 a:hover::after{opacity:1}
+
+/* enquiry */
+.enq{background:var(--forest);color:var(--ivory);overflow:hidden}
+.enq .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.enq h2{font-size:clamp(2.2rem,4.8vw,4rem)}
+.enq p{margin-top:18px;color:rgba(248,246,234,.78);max-width:28em}
+.form{background:var(--ivory);color:var(--ink);border-radius:32px;padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form .full{grid-column:1/-1}
+.form label{font-weight:600;font-size:.9rem;display:flex;flex-direction:column;gap:6px;min-width:0}
+.form input,.form select,.form textarea{font:inherit;padding:.8em 1em;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);width:100%}
+.form input:focus,.form select:focus,.form textarea:focus{outline:3px solid var(--leaf);border-color:transparent}
+.form .msg{font-size:.92rem;min-height:1.4em;color:var(--leaf);font-weight:600}
+
+/* faq */
+.faq{max-width:860px}
+details{border-bottom:1px solid var(--line);padding:22px 0}
+summary{cursor:pointer;font-family:var(--display);font-size:1.45rem;list-style:none;display:flex;justify-content:space-between;gap:20px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--body);font-size:1.8rem;color:var(--apple);transition:transform .3s;flex:none}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin-top:14px;color:var(--muted);max-width:44em}
+
+/* visit */
+.visit{background:var(--leaf-soft)}
+.visit .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.visit h2{font-size:clamp(2.2rem,4.6vw,3.6rem)}
+.info{display:flex;flex-direction:column;gap:18px;margin-top:26px}
+.info div{display:flex;gap:14px;align-items:flex-start}
+.info svg{width:26px;height:26px;flex:none;color:var(--leaf);margin-top:2px}
+.info b{display:block}
+.mapcard{border-radius:36px;background:var(--forest);color:var(--ivory);padding:34px;min-height:340px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:14px}
+.mapcard svg.pin{position:absolute;right:-30px;top:-30px;width:260px;opacity:.16}
+.mapcard h3{font-size:2rem}
+.copy{padding:.2em .7em;border:1.5px solid currentColor;border-radius:99px;font-size:.8rem;margin-left:8px;font-weight:600}
+
+/* news + footer */
+.news{background:var(--apple);color:#fff;padding-block:70px;text-align:center}
+.news h2{font-size:clamp(2rem,4.4vw,3.4rem);max-width:14em;margin:0 auto}
+.news form{display:flex;gap:10px;max-width:520px;margin:28px auto 0;flex-wrap:wrap;justify-content:center}
+.news input{flex:1;min-width:220px;padding:1em 1.3em;border-radius:99px;border:0;font:inherit;background:#fff;color:var(--ink)}
+.news .btn{background:var(--forest);color:var(--ivory)}
+.news .ok{margin-top:14px;font-weight:600;min-height:1.5em}
+footer{background:var(--forest);color:rgba(248,246,234,.8);padding-block:64px 36px;font-size:.95rem}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px}
+footer h4{margin:0 0 12px;color:var(--nut);font-family:var(--display);font-weight:400;font-size:1.2rem}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+footer a:hover{color:var(--nut)}
+footer .brand{color:var(--ivory)}
+footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.85rem}
+.wa{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:120;width:60px;height:60px;border-radius:50%;background:#25a244;color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px -8px rgba(0,0,0,.4);transition:transform .25s}
+.wa:hover{transform:scale(1.1) rotate(-6deg)}
+.wa svg{width:30px;height:30px}
+
+/* cart */
+#veil{position:fixed;inset:0;background:rgba(10,20,14,.55);z-index:210;opacity:0;visibility:hidden;transition:.35s}
+#veil.on{opacity:1;visibility:visible}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--ivory);z-index:220;transform:translateX(105%);transition:transform .5s cubic-bezier(.7,0,.2,1);display:flex;flex-direction:column;padding:max(22px,env(safe-area-inset-top,0px)) max(22px,env(safe-area-inset-right,0px)) max(22px,env(safe-area-inset-bottom,0px)) 22px}
+#drawer.on{transform:none}
+#drawer header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+#drawer h3{font-size:1.9rem}
+#items{flex:1;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.line{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px;border:1px solid var(--line)}
+.line .thumb{width:64px;height:64px;border-radius:14px;display:grid;place-items:center}
+.line .thumb svg{width:70%}
+.line b{display:block;line-height:1.2}
+.line small{color:var(--muted)}
+.qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qty button{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);font-weight:700}
+.empty{text-align:center;color:var(--muted);padding:50px 10px}
+.empty svg{width:90px;margin:0 auto 12px;display:block}
+.total{display:flex;justify-content:space-between;font-family:var(--display);font-size:1.5rem;padding:16px 0}
+#toast{position:fixed;left:50%;bottom:max(90px,env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--forest);color:var(--ivory);padding:.8em 1.4em;border-radius:99px;z-index:250;opacity:0;transition:.35s;font-weight:600;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1000px){
+  .menu{display:none}#burger{display:block}.nav-actions{margin-left:auto}
+  .hero .wrap,.factory .wrap,.nut .wrap,.enq .wrap,.visit .wrap{grid-template-columns:1fr;gap:40px}
+  .hero-pic{max-width:420px}
+  .rgrid{grid-template-columns:1fr}
+  .insta .grid2{grid-template-columns:repeat(3,1fr)}
+  .badges .wrap{grid-template-columns:1fr 1fr}
+  footer .cols{grid-template-columns:1fr 1fr}
+  .sec{padding-block:80px}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .nav .wrap{height:64px;gap:10px}.brand small{display:none}.brand{font-size:1.15rem}.brand svg{width:40px;height:40px}
+  .nav-actions .btn{display:none}
+  .form{grid-template-columns:1fr;padding:22px}
+  .bar-row{grid-template-columns:96px 1fr 62px;gap:10px;font-size:.9rem}
+  footer .cols{grid-template-columns:1fr}
+  .sticker{width:100px;height:100px;font-size:.88rem}
+  .factory .pic{border-radius:160px 160px 28px 28px}
+}
+@media (prefers-reduced-motion:reduce){
+  .blob,.marq .tr,#loader svg,.hint i{animation:none}
+}
+</style>
+
+</head>
+<body>
+<!-- Inline SVG library -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="cashew" viewBox="0 0 64 48">
+      <path d="M6 30C4 14 22 3 40 7c12 3 17 12 11 19-4 5-11 4-13 0-2-4-6-6-10-4-6 3-5 12 1 16 4 3 1 8-5 8C14 46 7 40 6 30Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="leaf" viewBox="0 0 80 120">
+      <path d="M40 2C8 30 2 70 40 118 78 70 72 30 40 2Z" fill="currentColor"/>
+      <path d="M40 14V112" stroke="rgba(255,255,255,.45)" stroke-width="2" fill="none"/>
+      <path d="M40 40 22 58M40 62 20 84M40 40 58 58M40 62 60 84" stroke="rgba(255,255,255,.3)" stroke-width="1.6" fill="none"/>
+    </symbol>
+    <symbol id="logo" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="96" fill="#f8f6ea" stroke="#4a3426" stroke-width="4"/>
+      <circle cx="100" cy="100" r="86" fill="none" stroke="#4a3426" stroke-width="1.6"/>
+      <g stroke="#e0b24d" stroke-width="2.5" stroke-linecap="round"><path d="M100 28v14M76 33l5 12M124 33l-5 12M58 46l9 10M142 46l-9 10"/></g>
+      <g transform="translate(42 54)">
+        <use href="#leaf" x="-4" y="26" width="20" height="30" transform="rotate(-70 6 41)" style="color:#4f8a3a"/>
+        <use href="#leaf" x="102" y="26" width="20" height="30" transform="rotate(70 112 41)" style="color:#4f8a3a"/>
+        <use href="#cashew" x="6" y="22" width="52" height="40" style="color:#e9c98e"/>
+        <use href="#cashew" x="58" y="18" width="52" height="40" transform="scale(-1 1) translate(-168 0)" style="color:#e9c98e"/>
+        <use href="#cashew" x="30" y="30" width="56" height="44" style="color:#dcae60"/>
+      </g>
+      <text x="100" y="128" text-anchor="middle" font-family="Young Serif,Georgia,serif" font-size="27" fill="#4a3426" letter-spacing="1">SAVITRI</text>
+      <text x="100" y="146" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="700" font-size="9" fill="#4a3426" letter-spacing="3">ENTERPRISES</text>
+      <text x="100" y="166" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="700" font-size="9.5" fill="#4a3426" letter-spacing="1.2">CASHEWNUT FACTORY &amp; SHOP</text>
+    </symbol>
+    <symbol id="i-leaf" viewBox="0 0 48 48"><path d="M40 8C16 8 8 20 8 30c0 6 4 10 10 10 12 0 22-12 22-32Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 42C16 30 24 22 34 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 48 48"><path d="M16 26V12a3 3 0 0 1 6 0v10m0-4V8a3 3 0 0 1 6 0v14m0-8a3 3 0 0 1 6 0v18c0 8-5 12-12 12-6 0-10-3-13-9l-5-9a3 3 0 0 1 5-3l3 4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-box" viewBox="0 0 48 48"><path d="M6 14 24 6l18 8v20L24 42 6 34ZM6 14l18 8 18-8M24 22v20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 48 48"><circle cx="24" cy="24" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 48 48"><path d="M24 44S10 30 10 20a14 14 0 0 1 28 0c0 10-14 24-14 24Z" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="24" cy="20" r="5" fill="none" stroke="currentColor" stroke-width="2.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M24 12v13l8 5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 48 48"><path d="M12 6h8l4 10-5 3c2 5 5 8 10 10l3-5 10 4v8c0 3-3 5-6 5C22 41 7 26 7 11c0-3 2-5 5-5Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div id="bar"></div>
+<div id="loader" role="status"><div><svg viewBox="0 0 200 200"><use href="#logo"/></svg><p>Opening the jar</p><small id="lp">0%</small></div></div>
+
+<div id="ann"><span>Fresh batch packed this week. Free delivery on orders above ₹999 (sample offer).</span><button id="annx" aria-label="Dismiss announcement">×</button></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Savitri Cashews home"><svg viewBox="0 0 200 200"><use href="#logo"/></svg><span>Savitri Cashews<small>Factory &amp; shop</small></span></a>
+    <nav class="menu" aria-label="Main">
+      <a href="#shop">Shop</a><a href="#process">How we make it</a><a href="#grades">Grades</a><a href="#factory">Our factory</a><a href="#recipes">Recipes</a><a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="#bulk">Bulk orders</a>
+      <button id="cartBtn" aria-label="Open cart">Cart <b id="cnt">0</b></button>
+      <button id="burger" aria-label="Open menu"><svg width="20" height="14" viewBox="0 0 20 14"><path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" stroke-width="2"/></svg></button>
+    </div>
+  </div>
+</header>
+<div id="mobile" aria-hidden="true"><a href="#shop">Shop</a><a href="#process">How we make it</a><a href="#grades">Grades</a><a href="#factory">Our factory</a><a href="#recipes">Recipes</a><a href="#bulk">Bulk orders</a><a href="#visit">Visit us</a></div>
+
+<main id="top">
+<section class="hero">
+  <div class="leaf" style="left:-30px;top:60px;width:90px;color:#4f8a3a;transform:rotate(-25deg)" data-speed="0.2"><svg viewBox="0 0 80 120"><use href="#leaf"/></svg></div>
+  <div class="leaf" style="left:44%;top:12px;width:56px;color:#7aa85a;transform:rotate(30deg)" data-speed="0.5"><svg viewBox="0 0 80 120"><use href="#leaf"/></svg></div>
+  <div class="leaf" style="right:-20px;bottom:90px;width:120px;color:#3d7430;transform:rotate(140deg)" data-speed="0.3"><svg viewBox="0 0 80 120"><use href="#leaf"/></svg></div>
+  <div class="leaf" style="left:8%;bottom:40px;width:64px;color:#7aa85a;transform:rotate(-120deg)" data-speed="0.6"><svg viewBox="0 0 80 120"><use href="#leaf"/></svg></div>
+  <div class="wrap">
+    <div>
+      <p class="kicker" id="k1">Savitri Enterprises · Cashewnut factory &amp; shop</p>
+      <h1 id="h1" style="margin-top:14px"><span class="ln"><span>Cashews</span></span><span class="ln"><span>straight from</span></span><span class="ln"><span>our factory.</span></span></h1>
+      <p class="lead" id="lead">Graded by hand, packed fresh and sent to your door. Buy a jar for the kitchen or a sack for the shop, from the people who shell them.</p>
+      <div class="cta" id="cta"><a class="btn btn-main" href="#shop">Shop cashews</a><a class="btn btn-ghost" href="#process">See how we make them</a></div>
+    </div>
+    <div class="hero-pic" id="heroPic">
+      <div class="blob"><img src="assets/img/cashews.jpg" alt="A heap of whole creamy cashew kernels with green leaves"></div>
+      <div class="sticker">Fresh<br>from the<br>factory</div>
+    </div>
+  </div>
+</section>
+
+<div class="marq" aria-hidden="true"><div class="tr" id="mq"></div></div>
+
+<section class="stage" id="stage" aria-label="Cashews falling into a jar, animated as you scroll">
+  <canvas id="cv"></canvas>
+  <div class="beats">
+    <div class="beat" data-in="0.00" data-out="0.22"><div class="wrap"><h2>Every cashew starts on a tree.</h2><p>Scroll down and watch them fall.</p></div></div>
+    <div class="beat" data-in="0.24" data-out="0.46"><div class="wrap"><h2>Whole, creamy and crunchy.</h2><p>Kernels sorted by size and colour, so each jar looks and tastes the same.</p></div></div>
+    <div class="beat" data-in="0.48" data-out="0.70"><div class="wrap"><h2>Packed the day it is graded.</h2><p>No long stays in a warehouse. Sealed fresh, then shipped.</p></div></div>
+    <div class="beat" data-in="0.78" data-out="1.01"><div class="wrap"><h2>Savitri Cashews, sealed with care.</h2><p>Jars, pouches and bulk sacks from our own factory.</p><a class="btn btn-main" href="#shop">Fill your jar</a></div></div>
+  </div>
+  <div class="hint" id="hint"><span>Scroll</span><i></i></div>
+  <div id="fcount" aria-hidden="true"></div>
+</section>
+
+<section class="sec" id="shop">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="kicker">The shop</p><h2>All the crunch, none of the filler.</h2></div><p>Pick a size, add to cart and send your order on WhatsApp. We confirm and dispatch.</p></div>
+    <div class="tabs" id="tabs" role="group" aria-label="Filter products"></div>
+    <div class="grid" id="grid"></div>
+    <p class="note">Prices shown are sample prices for the demo. Replace them with your current rates in the product list.</p>
+  </div>
+</section>
+
+<section class="badges">
+  <div class="wrap">
+    <div class="badge"><svg><use href="#i-leaf"/></svg><b>Naturally grown</b><span>Cashews from farms, processed at our own factory.</span></div>
+    <div class="badge"><svg><use href="#i-hand"/></svg><b>Hand graded</b><span>Every batch is checked by eye before it is packed.</span></div>
+    <div class="badge"><svg><use href="#i-box"/></svg><b>Sealed fresh</b><span>Airtight pouches and jars keep the crunch.</span></div>
+    <div class="badge"><svg><use href="#i-sun"/></svg><b>Nothing added</b><span>Plain kernels carry no colour or preservatives.</span></div>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="wrap head"><p class="kicker" style="color:var(--nut)">Tree to jar</p><h2 style="margin-top:8px">Six steps. Keep scrolling.</h2><div class="pline"><i id="pl"></i></div></div>
+  <div class="track" id="track">
+    <article class="step"><div class="n">1</div><h3>Harvest</h3><p>Ripe cashew apples are picked and the nut is twisted off the fruit.</p></article>
+    <article class="step"><div class="n">2</div><h3>Sun dry</h3><p>Raw nuts dry in the open air so the shell loosens and moisture falls.</p></article>
+    <article class="step"><div class="n">3</div><h3>Steam and shell</h3><p>Gentle steam softens the hard shell. It is cut open without breaking the kernel inside.</p></article>
+    <article class="step"><div class="n">4</div><h3>Peel</h3><p>The thin brown skin comes off by hand and by machine, leaving a creamy white kernel.</p></article>
+    <article class="step"><div class="n">5</div><h3>Grade</h3><p>Kernels are sorted by size, shape and colour into whole grades, splits and pieces.</p></article>
+    <article class="step"><div class="n">6</div><h3>Pack</h3><p>Weighed and sealed into jars, pouches and bulk cartons, ready to ship.</p></article>
+  </div>
+</section>
+
+<section class="sec" id="grades">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="kicker">Cashew grades</p><h2>Know your W-number.</h2></div><p>The number is roughly how many whole kernels weigh one pound. Lower means bigger.</p></div>
+    <div class="grades" id="gr"></div>
+  </div>
+</section>
+
+<section class="sec factory" id="factory">
+  <div class="wrap">
+    <div class="pic"><img id="fpic" src="assets/img/cashews.jpg" alt="Whole cashew kernels graded at the factory"></div>
+    <div>
+      <p class="kicker">Our factory</p>
+      <h2>Made here. Not just sold here.</h2>
+      <p>Founded and managed by owner <strong>Vinit Utekar</strong>, Savitri Enterprises runs its own cashew processing unit and factory shop in Poladpur, Raigad. That means you can buy a small bag or a large order directly from the people who shell, peel and grade every kernel.</p>
+      <div class="facts">
+        <div class="fact"><b>Own processing</b><span>Shelling to packing under one roof</span></div>
+        <div class="fact"><b>Retail and bulk</b><span>From 250 g to full cartons</span></div>
+        <div class="fact"><b>Custom packs</b><span>Gift boxes for festivals and weddings</span></div>
+        <div class="fact"><b>Visit anytime</b><span>See the factory shop in person</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec nut">
+  <div class="wrap">
+    <div><p class="kicker">Good for you</p><h2>Small nut, big nutrition.</h2><p class="sub">Typical values for raw cashews, per 100 g. Roasted and flavoured varieties differ slightly.</p></div>
+    <div class="bars" id="bars"></div>
+  </div>
+</section>
+
+<section class="sec recipes" id="recipes">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="kicker">In your kitchen</p><h2>Three ways to use a jar.</h2></div><p>Simple ideas from home cooks. Pure, freshly graded cashews do the heavy lifting.</p></div>
+    <div class="rgrid">
+      <article class="rcard">
+        <span class="time">15 min · Velvety Base</span>
+        <h3>Cashew cream &amp; curries</h3>
+        <p>A silky, dairy-free base that lends rich body and restaurant-style creaminess to gravies, pasta, and soups.</p>
+        <ul>
+          <li><strong>1 cup</strong> Savitri whole cashews, soaked in warm water for 2 hours</li>
+          <li><strong>½ cup</strong> fresh water, pinch of sea salt</li>
+          <li>Blend until silky smooth. Stir into shahi gravies, korma, or creamy pasta sauces.</li>
+        </ul>
+      </article>
+      <article class="rcard">
+        <span class="time">35 min · Festive Sweet</span>
+        <h3>Traditional Kaju Katli</h3>
+        <p>The timeless festival favourite, prepared with only three ingredients. Naturally sweet, buttery, and melts in the mouth.</p>
+        <ul>
+          <li><strong>1 cup</strong> Savitri cashews, ground into a fine powder</li>
+          <li><strong>½ cup</strong> sugar and <strong>¼ cup</strong> water simmered to one-string consistency</li>
+          <li>Knead to a soft dough, roll between sheets, and cut into iconic diamonds.</li>
+        </ul>
+      </article>
+      <article class="rcard">
+        <span class="time">25 min · Fragrant Main</span>
+        <h3>Royal Cashew Pulao</h3>
+        <p>Aromatic basmati rice cooked with whole spices and topped with crisp, golden ghee-roasted cashews.</p>
+        <ul>
+          <li><strong>½ cup</strong> Savitri cashews fried in pure ghee until crisp &amp; golden</li>
+          <li>Cook aged basmati rice with bay leaf, cloves, and cardamom</li>
+          <li>Gently fold in the roasted cashews right before serving for maximum crunch.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec insta">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="kicker">On Instagram</p><h2>Follow the crunch.</h2></div><a class="btn btn-leaf" href="https://www.instagram.com/savitri__cashews/" target="_blank" rel="noopener">Follow @savitri__cashews</a></div>
+    <div class="grid2" id="ig"></div>
+  </div>
+</section>
+
+<section class="sec enq" id="bulk">
+  <div class="wrap">
+    <div><p class="kicker" style="color:var(--nut)">Bulk and gifting</p><h2>Stocking a shop or planning a wedding?</h2><p>Tell us what you need and how much. We reply on WhatsApp with grades, rates and delivery time.</p></div>
+    <form class="form" id="enq" novalidate>
+      <label>Your name<input id="f-name" required autocomplete="name"></label>
+      <label>Phone<input id="f-phone" type="tel" required autocomplete="tel" inputmode="tel"></label>
+      <label>I need<select id="f-type"><option>Whole cashews (W180 to W450)</option><option>Splits and pieces</option><option>Roasted and flavoured</option><option>Festival gift boxes</option><option>Wedding or event hampers</option></select></label>
+      <label>Quantity<input id="f-qty" placeholder="e.g. 25 kg"></label>
+      <label class="full">Notes<textarea id="f-note" rows="3" placeholder="City, delivery date, custom packing"></textarea></label>
+      <button class="btn btn-main full" type="submit" style="justify-content:center">Send enquiry on WhatsApp</button>
+      <p class="msg full" id="enqMsg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+<section class="sec" id="faq">
+  <div class="wrap faq">
+    <div class="sec-head" style="margin-bottom:20px"><div><p class="kicker">Questions</p><h2>Good to know.</h2></div></div>
+    <details><summary>How should I store cashews?</summary><p>Keep them in an airtight jar in a cool, dry place. For more than two months, the fridge keeps them fresh longer.</p></details>
+    <details><summary>Do you sell small packs and bulk?</summary><p>Yes. Retail packs start at 250 g. For shops, caterers and gifting we supply bulk cartons at wholesale rates.</p></details>
+    <details><summary>What is the difference between W180, W240, W320 and W450?</summary><p>They are grades of whole kernels by size. W180 is the largest and richest. W320 is the everyday favourite. W450 is smaller and great for cooking.</p></details>
+    <details><summary>Do you deliver across India?</summary><p>Orders are confirmed on WhatsApp, where we share the delivery time and charges for your pin code.</p></details>
+    <details><summary>Can I visit the factory shop?</summary><p>Yes. Find the address and timings in the visit section below, or message us before you come.</p></details>
+  </div>
+</section>
+
+<section class="sec visit" id="visit">
+  <div class="wrap">
+    <div>
+      <p class="kicker">Visit us</p><h2>Come to the factory shop.</h2>
+      <div class="info">
+        <div><svg><use href="#i-pin"/></svg><span><b>Factory Address</b><span id="addr">Savitri Enterprises, Sawad, Kangule, Poladpur, Raigad, Maharashtra – 402302</span></span></div>
+        <div><svg><use href="#i-clock"/></svg><span><b>Hours</b>Monday to Sunday: 8:30 AM – 8:30 PM</span></div>
+        <div><svg><use href="#i-hand"/></svg><span><b>Owner</b>Vinit Utekar</span></div>
+        <div><svg><use href="#i-phone"/></svg><span><b>WhatsApp and phone</b><span id="ph">+91 00000 00000</span><button class="copy" id="copyPh">Copy</button></span></div>
+      </div>
+    </div>
+    <div class="mapcard">
+      <svg class="pin" viewBox="0 0 48 48"><use href="#i-pin"/></svg>
+      <h3>Find us on the map</h3><p>Open factory directions to Poladpur on Google Maps.</p>
+      <a class="btn btn-main" style="align-self:flex-start" id="mapLink" href="https://maps.app.goo.gl/GAc5chMrwyqt8CAu8" target="_blank" rel="noopener">Get directions on Google Maps</a>
+    </div>
+  </div>
+</section>
+
+<section class="news">
+  <div class="wrap"><h2>Join the Savitri list for fresh batches and festival offers.</h2>
+    <form id="nf" novalidate><label class="sr" for="nmail">Email</label><input id="nmail" type="email" placeholder="you@email.com" autocomplete="email"><button class="btn" type="submit">Sign me up</button></form>
+    <p class="ok" id="nok" role="status"></p></div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="#top"><svg viewBox="0 0 200 200"><use href="#logo"/></svg><span>Savitri Cashews</span></a>
+        <p style="margin-top:14px;max-width:24em">Cashewnut factory and shop. Fresh kernels, graded by hand.</p>
+        <p style="margin-top:12px;font-size:0.95rem;color:var(--nut)"><strong>Owner:</strong> Vinit Utekar</p>
+      </div>
+      <div><h4>Shop</h4><ul><li><a href="#shop">All cashews</a></li><li><a href="#grades">Grades</a></li><li><a href="#bulk">Bulk orders</a></li></ul></div>
+      <div><h4>Learn</h4><ul><li><a href="#process">How we make it</a></li><li><a href="#recipes">Recipes</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div><h4>Factory Location</h4>
+        <ul>
+          <li><span style="display:block;line-height:1.4">Sawad, Kangule, Poladpur, Raigad, Maharashtra 402302</span></li>
+          <li><a href="https://maps.app.goo.gl/GAc5chMrwyqt8CAu8" target="_blank" rel="noopener" style="color:var(--nut);text-decoration:underline">Open in Google Maps ↗</a></li>
+          <li><a href="https://www.instagram.com/savitri__cashews/" target="_blank" rel="noopener">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2026 Savitri Enterprises. All rights reserved. · Owner: Vinit Utekar</span>
+      <span>Factory &amp; Shop: Poladpur, Raigad, Maharashtra 402302 · <a href="https://maps.app.goo.gl/GAc5chMrwyqt8CAu8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Google Maps Directions</a></span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa" id="wa" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3Zm0 2.4a10.6 10.6 0 1 1-5.5 19.7l-.4-.2-3.8 1.2 1.2-3.7-.3-.4A10.6 10.6 0 0 1 16 5.4Zm-4 5.2c-.3 0-.7.1-1 .5-.4.4-1.300 1.300-1.300 3.100s1.300 3.500 1.500 3.800c.2.2 2.600 4.100 6.400 5.600 3.100 1.200 3.800 1 4.500.9.700-.1 2.200-.9 2.500-1.800.3-.9.3-1.600.2-1.800-.1-.2-.4-.3-.8-.5-.4-.2-2.200-1.100-2.500-1.200-.3-.1-.6-.2-.8.200-.2.400-1 1.200-1.100 1.400-.2.200-.4.300-.8.100-.4-.2-1.600-.6-3-1.900-1.100-1-1.900-2.200-2.100-2.600-.2-.4 0-.6.200-.8l.6-.7c.2-.2.200-.4.400-.6.100-.2 0-.5 0-.7l-1.100-2.700c-.3-.7-.6-.6-.8-.6Z"/></svg></a>
+
+<div id="veil"></div>
+<aside id="drawer" aria-label="Cart" aria-hidden="true">
+  <header><h3>Your cart</h3><button id="closeCart" aria-label="Close cart" style="font-size:2rem;line-height:1">×</button></header>
+  <div id="items"></div>
+  <div class="total"><span>Total</span><span id="tot">₹0</span></div>
+  <button class="btn btn-main" id="checkout" style="justify-content:center">Order on WhatsApp</button>
+  <p class="note" style="text-align:center">Payment and delivery are confirmed with you on WhatsApp.</p>
+</aside>
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== CONFIG: replace these with real details ===== */
+const PHONE = "910000000000";             // WhatsApp number with country code, no plus sign
+const PHONE_SHOW = "+91 00000 00000";
+const SIZES = {"250 g":1,"500 g":1.9,"1 kg":3.6};
+const PRODUCTS = [
+  {id:"w180",name:"W180 Royal Jumbo",tag:"Our largest whole kernels. Rich and buttery.",cat:"Whole",base:420,bg:"#e8dcb8",pouch:"#4a3426"},
+  {id:"w240",name:"W240 Jumbo",tag:"Large, creamy kernels for gifting and snacking.",cat:"Whole",base:380,bg:"#dfe9cf",pouch:"#2f5d3a"},
+  {id:"w320",name:"W320 Classic",tag:"The everyday favourite. Crisp and mild.",cat:"Whole",base:340,bg:"#f1e3c3",pouch:"#7a5a2f"},
+  {id:"roast",name:"Roasted and Salted",tag:"Slow roasted with a light pinch of salt.",cat:"Roasted",base:390,bg:"#f0d8b0",pouch:"#a5471f"},
+  {id:"pepper",name:"Black Pepper Roast",tag:"Warm, peppery and hard to stop eating.",cat:"Flavoured",base:400,bg:"#d9d8cf",pouch:"#2b2b2b"},
+  {id:"peri",name:"Peri-Peri Kaju",tag:"A tangy chilli kick on a crunchy base.",cat:"Flavoured",base:410,bg:"#f6d3c6",pouch:"#d9482b"},
+  {id:"split",name:"Splits and Pieces",tag:"Broken kernels. Best for sweets and gravies.",cat:"Pieces",base:290,bg:"#e6ecd2",pouch:"#4f8a3a"},
+  {id:"gift",name:"Festival Gift Box",tag:"Assorted roasted cashews in a ribboned box.",cat:"Gifting",base:699,bg:"#f4d9d0",pouch:"#7b1f2b",fixed:true}
+];
+const GRADES=[["W180","Largest whole kernels. Rich, premium.",4],["W240","Large and creamy. Popular for gifts.",3],["W320","Medium. The everyday all-rounder.",2],["W450","Smaller kernels. Great for cooking.",1],["Splits","Broken in half. Sweets and gravies.",0]];
+const NUTR=[["Calories",553,"kcal",553/600],["Fat",44,"g",44/50],["Carbs",30,"g",30/50],["Protein",18,"g",18/50],["Magnesium",292,"mg",292/400]];
+const FRAMES=192;
+
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rs=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const waLink=t=>"https://wa.me/"+PHONE+"?text="+encodeURIComponent(t);
+$("#wa").href=waLink("Hi Savitri Cashews, I would like to know more.");
+$("#ph").textContent=PHONE_SHOW;
+
+/* ---------- pouch art ---------- */
+function pouch(c){return `<svg viewBox="0 0 160 200" aria-hidden="true"><path d="M30 12h100l8 20-6 140q0 18-18 18H46q-18 0-18-18L22 32Z" fill="${c}"/><path d="M22 32h116" stroke="rgba(255,255,255,.35)" stroke-width="3"/><path d="M34 22h92" stroke="rgba(255,255,255,.25)" stroke-width="2" stroke-dasharray="3 4"/><circle cx="80" cy="102" r="50" fill="#f8f6ea"/><use href="#logo" x="32" y="54" width="96" height="96"/><g style="color:#e9c98e"><use href="#cashew" x="44" y="164" width="22" height="16"/><use href="#cashew" x="68" y="166" width="22" height="16"/><use href="#cashew" x="92" y="164" width="22" height="16"/></g></svg>`}
+
+/* ---------- shop ---------- */
+const cart=[]; let filter="All";
+const cats=["All",...new Set(PRODUCTS.map(p=>p.cat))];
+const tabs=$("#tabs");
+cats.forEach(c=>{const b=document.createElement("button");b.className="tab";b.textContent=c;b.setAttribute("aria-pressed",c==="All");b.onclick=()=>{filter=c;$$(".tab").forEach(t=>t.setAttribute("aria-pressed",t===b));drawGrid(true)};tabs.append(b)});
+const priceFor=(p,s)=>p.fixed?p.base:p.base*SIZES[s];
+function drawGrid(anim){
+  const g=$("#grid");g.innerHTML="";
+  PRODUCTS.filter(p=>filter==="All"||p.cat===filter).forEach(p=>{
+    let size=p.fixed?"Box":"500 g";
+    const el=document.createElement("article");el.className="card";
+    el.innerHTML=`<div class="art" style="background:${p.bg}">${pouch(p.pouch)}</div><h3>${p.name}</h3><p class="tag">${p.tag}</p>
+    <div class="sizes">${p.fixed?`<button aria-pressed="true">500 g box</button>`:Object.keys(SIZES).map(s=>`<button aria-pressed="${s===size}" data-s="${s}">${s}</button>`).join("")}</div>
+    <div class="buy"><span class="price">${rs(priceFor(p,size))}</span><button class="add">Add to cart</button></div>`;
+    const pr=$(".price",el);
+    $$(".sizes button",el).forEach(b=>b.onclick=()=>{if(p.fixed)return;size=b.dataset.s;$$(".sizes button",el).forEach(x=>x.setAttribute("aria-pressed",x===b));pr.textContent=rs(priceFor(p,size))});
+    $(".add",el).onclick=()=>{addCart(p,size);toast(p.name+" added")};
+    g.append(el);
+  });
+  if(anim&&window.gsap)gsap.from("#grid .card",{y:30,opacity:0,stagger:.06,duration:.6,ease:"power3.out"});
+  window.ScrollTrigger&&ScrollTrigger.refresh();
+}
+function addCart(p,size){const k=p.id+size;const f=cart.find(i=>i.k===k);f?f.q++:cart.push({k,p,size,q:1});renderCart()}
+function renderCart(){
+  const box=$("#items");box.innerHTML="";let n=0,t=0;
+  cart.forEach(i=>{n+=i.q;const lt=priceFor(i.p,i.size)*i.q;t+=lt;
+    const d=document.createElement("div");d.className="line";
+    d.innerHTML=`<div class="thumb" style="background:${i.p.bg}">${pouch(i.p.pouch)}</div><div><b>${i.p.name}</b><small>${i.p.fixed?"Gift box":i.size}</small><div class="qty"><button aria-label="Less">−</button><span>${i.q}</span><button aria-label="More">+</button></div></div><b>${rs(lt)}</b>`;
+    const [m,pl]=$$(".qty button",d);m.onclick=()=>{i.q--;if(i.q<1)cart.splice(cart.indexOf(i),1);renderCart()};pl.onclick=()=>{i.q++;renderCart()};
+    box.append(d)});
+  if(!cart.length)box.innerHTML=`<div class="empty"><svg viewBox="0 0 200 200"><use href="#logo"/></svg>Your cart is empty.<br>Add a jar of cashews to start.</div>`;
+  $("#cnt").textContent=n;$("#tot").textContent=rs(t);$("#checkout").disabled=!cart.length;
+}
+function openCart(o){$("#drawer").classList.toggle("on",o);$("#veil").classList.toggle("on",o);$("#drawer").setAttribute("aria-hidden",!o);window.lenis&&(o?lenis.stop():lenis.start())}
+$("#cartBtn").onclick=()=>openCart(true);$("#closeCart").onclick=$("#veil").onclick=()=>openCart(false);
+$("#checkout").onclick=()=>{
+  if(!cart.length)return;
+  const lines=cart.map(i=>`• ${i.p.name} (${i.p.fixed?"gift box":i.size}) x ${i.q} = ${rs(priceFor(i.p,i.size)*i.q)}`).join("\n");
+  const msg=`Hello Savitri Cashews, I would like to order:\n${lines}\nTotal: ${$("#tot").textContent}\nName and delivery address:`;
+  const a=document.createElement("a");a.href=waLink(msg);a.target="_blank";a.rel="noopener";a.click();
+};
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1800)}
+drawGrid();renderCart();
+
+/* ---------- static content ---------- */
+$("#mq").innerHTML=Array(2).fill(["Fresh","Crunchy","Hand graded","Naturally rich","Factory direct","Savitri"].map(w=>`<span>${w}</span><span><i>✦</i></span>`).join("")).join("").repeat(2);
+$("#gr").innerHTML=GRADES.map(g=>`<div class="grade"><b>${g[0]}</b><div class="dots">${Array(g[2]*2||2).fill("<i></i>").join("")}</div><span>${g[1]}</span></div>`).join("");
+$("#bars").innerHTML=NUTR.map(n=>`<div class="bar-row"><span>${n[0]}</span><div class="t"><i data-w="${n[3]}"></i></div><em>${n[1]} ${n[2]}</em></div>`).join("");
+
+/* ---------- misc UI ---------- */
+$("#annx").onclick=()=>$("#ann").remove();
+const mob=$("#mobile");
+$("#burger").onclick=()=>{const o=!mob.classList.contains("open");mob.classList.toggle("open",o);mob.setAttribute("aria-hidden",!o);window.lenis&&(o?lenis.stop():lenis.start())};
+$$("#mobile a").forEach(a=>a.addEventListener("click",()=>{mob.classList.remove("open");window.lenis&&lenis.start()}));
+$("#copyPh").onclick=async()=>{try{await navigator.clipboard.writeText(PHONE_SHOW);toast("Number copied")}catch(e){const r=document.createRange();r.selectNodeContents($("#ph"));getSelection().removeAllRanges();getSelection().addRange(r);toast("Number selected")}};
+$("#nf").onsubmit=e=>{e.preventDefault();const v=$("#nmail").value.trim();$("#nok").textContent=/^\S+@\S+\.\S+$/.test(v)?"Thank you. You are on the list.":"Enter a valid email address."};
+$("#enq").onsubmit=e=>{e.preventDefault();const n=$("#f-name").value.trim(),p=$("#f-phone").value.trim();
+  if(!n||!p){$("#enqMsg").textContent="Add your name and phone number so we can reply.";return}
+  const msg=`Bulk enquiry\nName: ${n}\nPhone: ${p}\nNeed: ${$("#f-type").value}\nQuantity: ${$("#f-qty").value||"-"}\nNotes: ${$("#f-note").value||"-"}`;
+  $("#enqMsg").innerHTML=`Ready. <a href="${waLink(msg)}" target="_blank" rel="noopener" style="text-decoration:underline">Open WhatsApp to send it</a>.`};
+/* instagram grid from video frames */
+$("#ig").innerHTML=[8,35,62,88,120,150,170,191].slice(0,6).map(i=>`<a href="https://www.instagram.com/savitri__cashews/" target="_blank" rel="noopener" aria-label="Open Instagram"><img loading="lazy" alt="" src="assets/frames/f${String(i+1).padStart(3,"0")}.webp"></a>`).join("");
+
+/* ---------- frame sequence ---------- */
+const cv=$("#cv"),ctx=cv.getContext("2d"),imgs=new Array(FRAMES);let loaded=0,cur=0,dirty=true;
+function size(){const d=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;dirty=true}
+function draw(){
+  if(!dirty)return;const im=imgs[cur]&&imgs[cur].complete&&imgs[cur].naturalWidth?imgs[cur]:[...imgs.slice(0,cur+1)].reverse().find(x=>x&&x.naturalWidth);
+  if(!im)return;dirty=false;const cw=cv.width,ch=cv.height,s=Math.max(cw/im.naturalWidth,ch/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
+  const fx=0.5;ctx.drawImage(im,(cw-w)*fx,(ch-h)/2,w,h);
+}
+function load(i){return new Promise(r=>{const im=new Image();im.onload=im.onerror=()=>{loaded++;$("#lp").textContent=Math.round(loaded/FRAMES*100)+"%";r()};im.src="assets/frames/f"+String(i+1).padStart(3,"0")+".webp";imgs[i]=im})}
+addEventListener("resize",size);size();
+(function tick(){draw();requestAnimationFrame(tick)})();
+
+async function boot(){
+  const first=[0,...Array.from({length:23},(_,i)=>(i+1)*8)].filter(i=>i<FRAMES);
+  await Promise.race([Promise.all(first.map(load)),new Promise(r=>setTimeout(r,3500))]);
+  dirty=true;$("#loader").classList.add("done");intro();
+  // rest of frames in the background
+  const rest=Array.from({length:FRAMES},(_,i)=>i).filter(i=>!imgs[i]);
+  for(let i=0;i<rest.length;i+=6){await Promise.all(rest.slice(i,i+6).map(load))}
+  dirty=true;
+}
+setTimeout(()=>$("#loader").classList.add("done"),5000);
+
+boot();
+/* ---------- motion ---------- */
+try{
+gsap.registerPlugin(ScrollTrigger);
+let lenis;
+if(!reduce){
+  lenis=new Lenis({duration:1.15,smoothWheel:true});window.lenis=lenis;
+  lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);
+}
+$$('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{const h=a.getAttribute("href");if(h.length<2)return;const t=$(h);if(!t)return;e.preventDefault();lenis?lenis.scrollTo(t,{offset:-70}):t.scrollIntoView({behavior:"smooth"})}));
+gsap.to("#bar",{scaleX:1,ease:"none",scrollTrigger:{start:0,end:"max",scrub:.2}});
+
+function intro(){
+  if(reduce||!window.gsap)return;
+  gsap.from("#h1 .ln span",{yPercent:110,duration:1.1,ease:"power4.out",stagger:.12});
+  gsap.from(["#k1","#lead","#cta"],{y:24,opacity:0,duration:.9,delay:.5,stagger:.12,ease:"power3.out"});
+  gsap.from("#heroPic",{scale:.85,opacity:0,rotate:-6,duration:1.3,ease:"power3.out",delay:.2});
+}
+/* hero leaves drift */
+$$(".leaf").forEach(l=>{if(reduce)return;const sp=+l.dataset.speed;gsap.to(l,{y:()=>-260*sp*2,rotate:"+="+(sp*90),ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:true}});
+  gsap.to(l.firstElementChild,{x:12,duration:2+sp*3,yoyo:true,repeat:-1,ease:"sine.inOut"})});
+gsap.to("#heroPic",{yPercent:-12,ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:true}});
+
+/* scroll-scrubbed video stage */
+const beats=$$(".beat");
+ScrollTrigger.create({trigger:"#stage",start:"top top",end:"+=420%",pin:true,scrub:true,
+  onUpdate:s=>{
+    const p=s.progress;const f=Math.min(FRAMES-1,Math.round(p*(FRAMES-1)));if(f!==cur){cur=f;dirty=true}
+    $("#fcount").textContent=String(f+1).padStart(3,"0")+" / "+FRAMES;
+    $("#hint").style.opacity=p<.04?1:0;
+    beats.forEach(b=>{const a=+b.dataset.in,o=+b.dataset.out,fd=.04;let v=0;
+      if(p>=a&&p<=o)v=Math.min(1,(p-a)/fd,(o-p)/fd);b.style.opacity=Math.max(0,v);b.style.transform=`translateY(${(1-Math.max(0,v))*40}px)`;b.style.pointerEvents=v>.5?"auto":"none"})}});
+
+/* process horizontal scroll */
+const track=$("#track");
+gsap.to(track,{x:()=>-(track.scrollWidth-innerWidth),ease:"none",
+  scrollTrigger:{trigger:"#process",start:"top top",end:()=>"+="+(track.scrollWidth-innerWidth+innerHeight*.3),pin:true,scrub:true,invalidateOnRefresh:true,
+    onUpdate:s=>$("#pl").style.transform=`scaleX(${s.progress})`}});
+
+/* parallax factory image, bars, reveals */
+gsap.to("#fpic",{yPercent:-12,ease:"none",scrollTrigger:{trigger:".factory .pic",start:"top bottom",end:"bottom top",scrub:true}});
+$$(".bar-row .t i").forEach(i=>gsap.to(i,{scaleX:+i.dataset.w,duration:1.4,ease:"power3.out",scrollTrigger:{trigger:i,start:"top 90%"}}));
+if(!reduce){
+  [".sec-head",".badge",".grade",".fact",".rcard",".insta a",".details,details"].forEach(s=>{const els=$$(s);if(!els.length)return;
+    gsap.from(els,{y:36,opacity:0,duration:.8,stagger:.08,ease:"power3.out",clearProps:"opacity,transform",scrollTrigger:{trigger:els[0],start:"top 92%",once:true}})});
+  gsap.from(".step",{opacity:.0,duration:.01});gsap.to(".step",{opacity:1,duration:.01,delay:.01});
+}
+addEventListener("load",()=>ScrollTrigger.refresh());
+}catch(err){
+  console.error("Animations unavailable:",err);
+  /* fallback: still scrub the video with plain scroll */
+  const st=$("#stage");st.style.height="520vh";const cvs=$("#cv");cvs.style.position="sticky";cvs.style.top="0";cvs.style.height="100vh";
+  addEventListener("scroll",()=>{const r=st.getBoundingClientRect(),p=Math.min(1,Math.max(0,-r.top/(st.offsetHeight-innerHeight)));const f=Math.round(p*(FRAMES-1));if(f!==cur){cur=f;dirty=true}},{passive:true});
+}
+</script>
+
+</body>
+</html>
