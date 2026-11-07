@@ -4,7 +4,8 @@ Official website for **Savitri Enterprises** — Cashewnut Factory & Shop locate
 
 ## Details
 - **Factory & Shop Address**: Sawad, Kangule, Poladpur, Raigad, Maharashtra – 402302 ([Google Maps](https://maps.app.goo.gl/GAc5chMrwyqt8CAu8))
-- **Owner**: Vinit Utekar
+- **Proprietor**: Vinit Utekar
+- **WhatsApp & Phone**: +91 98673 94593
 - **Key Features**:
   - Interactive scroll animation showcasing the cashew processing journey from tree to jar
   - Live product catalog with multiple grades (W180, W240, W320, flavoured roasts, festival gift boxes)
@@ -15,3 +16,4 @@ Official website for **Savitri Enterprises** — Cashewnut Factory & Shop locate
 ## Project Structure
 - `savitri/index.html` — Main website
 - `savitri/assets/` — Frame animation sequence, images, and JavaScript libraries (GSAP, ScrollTrigger, Lenis)
+
