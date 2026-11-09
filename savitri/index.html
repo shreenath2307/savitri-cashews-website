@@ -173,7 +173,7 @@ section{position:relative}
 
 /* grades */
 .grades{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.grade{padding:26px;border-radius:26px;background:var(--sage);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.grade{padding:26px;border-radius:26px;background:var(--sage);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;transition:transform .25s,box-shadow .25s,border-color .25s;cursor:pointer}
 .grade:hover{transform:translateY(-3px);box-shadow:0 12px 28px -10px rgba(20,41,28,.14);border-color:var(--leaf)}
 .grade b{font-family:var(--display);font-size:2.4rem;font-weight:400;color:var(--bark);line-height:1}
 .grade .dots{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:36px}
@@ -462,7 +462,7 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
     <article class="step"><div class="n">2</div><h3>Sun dry</h3><p>Raw nuts are dried in open yards under the sun to reduce natural moisture and stabilize the nut.</p></article>
     <article class="step"><div class="n">3</div><h3>Boil</h3><p>Raw cashews are boiled under controlled heat to soften the tough outer shell and prepare them for clean cracking.</p></article>
     <article class="step"><div class="n">4</div><h3>Shell separating</h3><p>The softened shell is carefully cracked and separated to release the intact whole cashew kernel inside without breakage.</p></article>
-    <article class="step"><div class="n">5</div><h3>Machine drying</h3><p>Kernels go into temperature-controlled hot-air drying chambers (Borma) to loosen the inner skin and seal in crispness.</p></article>
+    <article class="step"><div class="n">5</div><h3>Oven dry</h3><p>Kernels go into temperature-controlled hot-air drying ovens (Borma) to loosen the inner skin and seal in crispness.</p></article>
     <article class="step"><div class="n">6</div><h3>Peel</h3><p>The delicate reddish-brown inner skin (testa) is removed cleanly, uncovering the pure, creamy ivory kernel.</p></article>
     <article class="step"><div class="n">7</div><h3>Grade</h3><p>Every kernel is sorted by size, colour, and shape into whole grades (W180, W210, W240, W320, W400) and splits.</p></article>
     <article class="step"><div class="n">8</div><h3>Pack</h3><p>Weighed with precision and sealed into airtight pouches, jars, and cartons to lock in freshness and rich crunch.</p></article>
@@ -818,13 +818,11 @@ $("#gr").innerHTML=GRADES.map((g,idx)=>`
     </div>
     <div class="dots">${Array(g.count).fill(0).map(()=>`<img src="assets/img/icon-cashew.png" alt="" style="width:${g.sizePx}px;height:auto">`).join("")}</div>
     <span>${g.desc}</span>
-    <span class="grade-hint">Hover for details ↗</span>
+    <span class="grade-hint">Click for details ↗</span>
   </div>
 `).join("");
 
-let gradeCloseTimer=null, isMouseInModal=false;
 function openGradeModal(idx){
-  clearTimeout(gradeCloseTimer);
   const g=GRADES[idx];
   if(!g)return;
   $("#gmTitle").textContent=g.grade;
@@ -846,28 +844,17 @@ function openGradeModal(idx){
   bd.classList.add("active");
   bd.setAttribute("aria-hidden","false");
 }
-function scheduleCloseGradeModal(){
-  clearTimeout(gradeCloseTimer);
-  gradeCloseTimer=setTimeout(()=>{
-    if(!isMouseInModal)closeGradeModal();
-  },140);
-}
 function closeGradeModal(){
-  clearTimeout(gradeCloseTimer);
   const bd=$("#gradeBackdrop");
   bd.classList.remove("active");
   bd.setAttribute("aria-hidden","true");
 }
 $$("#gr .grade").forEach((card,idx)=>{
-  card.addEventListener("mouseenter",()=>openGradeModal(idx));
-  card.addEventListener("mouseleave",scheduleCloseGradeModal);
   card.addEventListener("click",()=>openGradeModal(idx));
+  card.addEventListener("keydown",e=>{
+    if(e.key==="Enter"||e.key===" "){e.preventDefault();openGradeModal(idx);}
+  });
 });
-const gmEl=$("#gradeModal");
-if(gmEl){
-  gmEl.addEventListener("mouseenter",()=>{isMouseInModal=true;clearTimeout(gradeCloseTimer);});
-  gmEl.addEventListener("mouseleave",()=>{isMouseInModal=false;scheduleCloseGradeModal();});
-}
 const bdEl=$("#gradeBackdrop");
 if(bdEl){
   bdEl.addEventListener("click",e=>{if(e.target===bdEl)closeGradeModal();});
