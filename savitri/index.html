@@ -86,7 +86,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .hero .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
 .hero-pic{position:relative;aspect-ratio:1/1;max-width:560px;width:100%;justify-self:center}
 .blob{position:absolute;inset:0;background:#fff;border-radius:58% 42% 55% 45% / 48% 56% 44% 52%;overflow:hidden;box-shadow:0 40px 80px -30px rgba(20,41,28,.35);animation:morph 14s ease-in-out infinite}
-.blob img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;transform:scale(1.15)}
+.blob img{width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
 @keyframes morph{50%{border-radius:42% 58% 45% 55% / 55% 45% 56% 44%}}
 .sticker{position:absolute;right:-2%;bottom:6%;width:128px;height:128px;border-radius:50%;background:var(--apple);color:#fff;display:grid;place-items:center;text-align:center;font-family:var(--display);font-size:1.05rem;line-height:1.1;transform:rotate(12deg);box-shadow:0 14px 30px -10px rgba(217,72,43,.6)}
 .leaf{position:absolute;pointer-events:none;z-index:1;opacity:.9}
@@ -175,7 +175,7 @@ section{position:relative}
 .factory{background:var(--sage);overflow:hidden}
 .factory .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
 .factory .pic{aspect-ratio:4/5;border-radius:220px 220px 36px 36px;overflow:hidden;position:relative;background:#fff}
-.factory .pic img{position:absolute;left:0;top:-10%;width:100%;height:120%;object-fit:cover;mix-blend-mode:multiply;will-change:transform}
+.factory .pic img{position:absolute;left:0;top:-10%;width:100%;height:120%;object-fit:cover;will-change:transform}
 .factory h2{font-size:clamp(2.2rem,4.6vw,3.8rem)}
 .factory p{margin-top:20px;color:var(--muted);max-width:32em}
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px}
@@ -205,12 +205,8 @@ section{position:relative}
 .rcard ul li strong{color:var(--forest)}
 
 /* instagram */
-.insta .grid2{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
-.insta .grid2 a{aspect-ratio:1/1;border-radius:22px;overflow:hidden;position:relative;display:block;background:#2b1b0f}
-.insta .grid2 a img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
-.insta .grid2 a:hover img{transform:scale(1.12)}
-.insta .grid2 a::after{content:"@savitri__cashews";position:absolute;inset:auto 0 0;padding:26px 10px 10px;font-size:.78rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));opacity:0;transition:.3s}
-.insta .grid2 a:hover::after{opacity:1}
+.insta-embed-wrap{display:flex;justify-content:center;margin-top:28px;width:100%}
+.insta-embed-wrap iframe{width:100%;max-width:540px;height:480px;border-radius:20px;border:1px solid var(--line);background:#fff;box-shadow:0 12px 32px rgba(20,41,28,.08);overflow:hidden}
 
 /* enquiry */
 .enq{background:var(--forest);color:var(--ivory);overflow:hidden}
@@ -290,7 +286,7 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
   .hero .wrap,.factory .wrap,.nut .wrap,.enq .wrap,.visit .wrap{grid-template-columns:1fr;gap:40px}
   .hero-pic{max-width:420px}
   .rgrid{grid-template-columns:1fr}
-  .insta .grid2{grid-template-columns:repeat(3,1fr)}
+  .insta-embed-wrap iframe{max-width:100%;height:450px}
   .badges .wrap{grid-template-columns:1fr 1fr}
   footer .cols{grid-template-columns:1fr 1fr}
   .sec{padding-block:80px}
@@ -382,7 +378,7 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
       <div class="cta" id="cta"><a class="btn btn-main" href="#shop">Shop cashews</a><a class="btn btn-ghost" href="#process">See how we make them</a></div>
     </div>
     <div class="hero-pic" id="heroPic">
-      <div class="blob"><img src="assets/img/cashews.jpg" alt="A heap of whole creamy cashew kernels with green leaves"></div>
+      <div class="blob"><img src="assets/img/hero-cashews.jpg" alt="Savitri Cashews fresh from the factory"></div>
       <div class="sticker">Fresh<br>from the<br>factory</div>
     </div>
   </div>
@@ -441,7 +437,7 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
 
 <section class="sec factory" id="factory">
   <div class="wrap">
-    <div class="pic"><img id="fpic" src="assets/img/cashews.jpg" alt="Whole cashew kernels graded at the factory"></div>
+    <div class="pic"><img id="fpic" src="assets/img/factory-cashews.jpg" alt="Cashews processed at the Savitri factory"></div>
     <div>
       <p class="kicker">Our factory</p>
       <h2>Made here. Not just sold here.</h2>
@@ -504,7 +500,9 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
 <section class="sec insta">
   <div class="wrap">
     <div class="sec-head"><div><p class="kicker">On Instagram</p><h2>Follow the crunch.</h2></div><a class="btn btn-leaf" href="https://www.instagram.com/savitri__cashews/" target="_blank" rel="noopener">Follow @savitri__cashews</a></div>
-    <div class="grid2" id="ig"></div>
+    <div class="insta-embed-wrap">
+      <iframe src="https://www.instagram.com/savitri__cashews/embed" title="Savitri Cashews on Instagram" allowtransparency="true" allowfullscreen="true" frameborder="0" scrolling="no" loading="lazy"></iframe>
+    </div>
   </div>
 </section>
 
@@ -686,8 +684,6 @@ $("#enq").onsubmit=e=>{e.preventDefault();const n=$("#f-name").value.trim(),p=$(
   if(!n||!p){$("#enqMsg").textContent="Add your name and phone number so we can reply.";return}
   const msg=`Bulk enquiry\nName: ${n}\nPhone: ${p}\nNeed: ${$("#f-type").value}\nQuantity: ${$("#f-qty").value||"-"}\nNotes: ${$("#f-note").value||"-"}`;
   $("#enqMsg").innerHTML=`Ready. <a href="${waLink(msg)}" target="_blank" rel="noopener" style="text-decoration:underline">Open WhatsApp to send it</a>.`};
-/* instagram grid from video frames */
-$("#ig").innerHTML=[8,35,62,88,120,150,170,191].slice(0,6).map(i=>`<a href="https://www.instagram.com/savitri__cashews/" target="_blank" rel="noopener" aria-label="Open Instagram"><img loading="lazy" alt="" src="assets/frames/f${String(i+1).padStart(3,"0")}.webp"></a>`).join("");
 
 /* ---------- frame sequence ---------- */
 const cv=$("#cv"),ctx=cv.getContext("2d"),imgs=new Array(FRAMES);let loaded=0,cur=0,dirty=true;
