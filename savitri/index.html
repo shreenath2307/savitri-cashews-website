@@ -206,6 +206,26 @@ section{position:relative}
 .gm-foot{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:.84rem;color:var(--muted);gap:12px;flex-wrap:wrap}
 .gm-foot .btn{padding:.55em 1.2em;font-size:.9rem}
 
+/* order checkout modal */
+#orderBackdrop{position:fixed;inset:0;z-index:280;background:rgba(10,24,16,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;display:flex;align-items:center;justify-content:center;padding:16px}
+#orderBackdrop.active{opacity:1;visibility:visible}
+#orderModal{background:var(--ivory);color:var(--ink);width:min(560px,100%);max-height:min(90vh,740px);overflow-y:auto;border-radius:28px;border:1px solid rgba(255,255,255,.5);box-shadow:0 30px 80px -15px rgba(0,0,0,.5),0 0 0 1px rgba(20,41,28,.08);padding:30px 28px 26px;position:relative;transform:scale(.94) translateY(12px);opacity:0;transition:transform .28s cubic-bezier(.16,1,.3,1),opacity .22s ease}
+#orderBackdrop.active #orderModal{transform:scale(1) translateY(0);opacity:1}
+#orderModalClose{position:absolute;right:16px;top:16px;width:34px;height:34px;border-radius:50%;background:rgba(20,41,28,.08);font-size:1.4rem;line-height:1;display:grid;place-items:center;color:var(--ink);transition:background .2s,transform .2s}
+#orderModalClose:hover{background:rgba(20,41,28,.16);transform:rotate(90deg)}
+.order-summary-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:16px 0 20px}
+.order-summary-box header{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.95rem;color:var(--forest);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+.order-summary-box ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:140px;overflow-y:auto}
+.order-summary-box li{display:flex;justify-content:space-between;font-size:.88rem;color:var(--muted)}
+.order-summary-box li b{color:var(--ink)}
+.order-summary-box .order-total-row{display:flex;justify-content:space-between;align-items:center;font-size:1.1rem;font-weight:700;color:var(--forest);margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.order-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.order-form .full{grid-column:1/-1}
+.order-form label{font-weight:600;font-size:.86rem;display:flex;flex-direction:column;gap:5px}
+.order-form input,.order-form textarea{font:inherit;padding:.75em .95em;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);width:100%}
+.order-form input:focus,.order-form textarea:focus{outline:3px solid var(--leaf);border-color:transparent}
+.order-form .error-msg{color:var(--apple);font-size:.84rem;font-weight:600;min-height:1.2em}
+
 /* factory */
 .factory{background:var(--sage);overflow:hidden}
 .factory .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
@@ -335,6 +355,8 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
   .grades{grid-template-columns:1fr;gap:14px}
   .gm-specs{grid-template-columns:1fr}
   #gradeModal{padding:22px 18px}
+  #orderModal{padding:22px 18px}
+  .order-form{grid-template-columns:1fr}
   .bar-row{grid-template-columns:96px 1fr 62px;gap:10px;font-size:.9rem}
   footer .cols{grid-template-columns:1fr}
   .sticker{width:100px;height:100px;font-size:.88rem}
@@ -647,12 +669,41 @@ footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255
     </div>
   </div>
 </div>
+<div id="orderBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="orderModal">
+    <button id="orderModalClose" aria-label="Close order details">×</button>
+    <span class="gm-badge" style="color:var(--leaf)">Delivery &amp; Contact Details</span>
+    <h3 style="font-size:1.85rem;color:var(--forest);margin:4px 0 2px">Complete Your Order</h3>
+    <p style="font-size:.9rem;color:var(--muted)">Enter your delivery details to generate your complete order message on WhatsApp.</p>
+
+    <div class="order-summary-box">
+      <header><span>Order Items</span><span id="ordItemCount">0 packs</span></header>
+      <ul id="ordItemsList"></ul>
+      <div class="order-total-row"><span>Total Amount</span><span id="ordTotalAmount">₹0</span></div>
+    </div>
+
+    <form id="orderForm" class="order-form" novalidate>
+      <label>Full Name *<input id="ordName" required autocomplete="name" placeholder="e.g. Rajesh Sharma"></label>
+      <label>WhatsApp / Phone Number *<input id="ordPhone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="e.g. 9867394593"></label>
+      <label class="full">Delivery Address (House/Flat, Street, Area) *<textarea id="ordAddress" rows="2" required autocomplete="street-address" placeholder="e.g. Flat 302, Green Valley Apartments, Near Station"></textarea></label>
+      <label>City / Town *<input id="ordCity" required autocomplete="address-level2" placeholder="e.g. Mumbai / Poladpur"></label>
+      <label>PIN Code *<input id="ordPin" type="text" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" required autocomplete="postal-code" placeholder="e.g. 402302"></label>
+      <label class="full">Delivery Notes (Optional)<input id="ordNotes" placeholder="e.g. Landmark, gift packing preference"></label>
+      <div class="full error-msg" id="ordError"></div>
+      <button class="btn btn-main full" type="submit" style="justify-content:center;padding:.85em 1.2em;font-size:1rem;gap:8px">
+        <span>Confirm &amp; Send on WhatsApp</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15c-1.49 0-2.95-.4-4.22-1.16l-.3-.18-3.13.82.84-3.05-.2-.31a8.13 8.13 0 0 1-1.25-4.36c0-4.51 3.67-8.17 8.18-8.17 2.19 0 4.24.85 5.78 2.39 1.55 1.55 2.4 3.6 2.4 5.78 0 4.51-3.67 8.18-8.18 8.18Z"/></svg>
+      </button>
+      <button type="button" id="ordBackToCart" style="grid-column:1/-1;text-align:center;font-size:.88rem;color:var(--muted);text-decoration:underline;padding:4px;cursor:pointer">← Back to Cart to edit items</button>
+    </form>
+  </div>
+</div>
 <aside id="drawer" aria-label="Cart" aria-hidden="true">
   <header><h3>Your cart</h3><button id="closeCart" aria-label="Close cart" style="font-size:2rem;line-height:1">×</button></header>
   <div id="items"></div>
   <div class="total"><span>Total</span><span id="tot">₹0</span></div>
-  <button class="btn btn-main" id="checkout" style="justify-content:center">Order on WhatsApp</button>
-  <p class="note" style="text-align:center">Payment and delivery are confirmed with you on WhatsApp.</p>
+  <button class="btn btn-main" id="checkout" style="justify-content:center">Proceed to Order →</button>
+  <p class="note" style="text-align:center">Next: Enter delivery address &amp; confirm on WhatsApp.</p>
 </aside>
 <div id="toast" role="status"></div>
 
@@ -799,12 +850,102 @@ function renderCart(){
 }
 function openCart(o){$("#drawer").classList.toggle("on",o);$("#veil").classList.toggle("on",o);$("#drawer").setAttribute("aria-hidden",!o);window.lenis&&(o?lenis.stop():lenis.start())}
 $("#cartBtn").onclick=()=>openCart(true);$("#closeCart").onclick=$("#veil").onclick=()=>openCart(false);
-$("#checkout").onclick=()=>{
-  if(!cart.length)return;
-  const lines=cart.map(i=>`• ${i.p.name} (${i.size}) x ${i.q} = ${rs(priceFor(i.p,i.size)*i.q)}`).join("\n");
-  const msg=`Hello Savitri Cashews, I would like to order:\n${lines}\nTotal: ${$("#tot").textContent}\nName and delivery address:`;
-  const a=document.createElement("a");a.href=waLink(msg);a.target="_blank";a.rel="noopener";a.click();
-};
+
+function openOrderModal(){
+  if(!cart.length){toast("Your cart is empty");return}
+  openCart(false);
+  let total=0,packs=0;
+  const list=$("#ordItemsList");
+  list.innerHTML=cart.map(i=>{
+    const lt=priceFor(i.p,i.size)*i.q;
+    total+=lt;
+    packs+=i.q;
+    return `<li><span>${i.p.name} (${i.size}) × ${i.q}</span><b>${rs(lt)}</b></li>`;
+  }).join("");
+  $("#ordItemCount").textContent=`${packs} ${packs===1?'pack':'packs'}`;
+  $("#ordTotalAmount").textContent=rs(total);
+  $("#ordError").textContent="";
+  const ob=$("#orderBackdrop");
+  ob.classList.add("active");
+  ob.setAttribute("aria-hidden","false");
+  window.lenis&&lenis.stop();
+  setTimeout(()=>$("#ordName")&&$("#ordName").focus(),120);
+}
+
+function closeOrderModal(){
+  const ob=$("#orderBackdrop");
+  ob.classList.remove("active");
+  ob.setAttribute("aria-hidden","true");
+  window.lenis&&lenis.start();
+}
+
+$("#checkout").onclick=openOrderModal;
+const ordCloseBtn=$("#orderModalClose");if(ordCloseBtn)ordCloseBtn.onclick=closeOrderModal;
+const ordBackBtn=$("#ordBackToCart");if(ordBackBtn)ordBackBtn.onclick=()=>{closeOrderModal();openCart(true)};
+const ordBdEl=$("#orderBackdrop");if(ordBdEl)ordBdEl.addEventListener("click",e=>{if(e.target===ordBdEl)closeOrderModal()});
+
+const orderFormEl=$("#orderForm");
+if(orderFormEl){
+  orderFormEl.onsubmit=e=>{
+    e.preventDefault();
+    if(!cart.length){
+      $("#ordError").textContent="Your cart is empty. Please add items first.";
+      return;
+    }
+    const name=$("#ordName").value.trim();
+    const phone=$("#ordPhone").value.trim();
+    const address=$("#ordAddress").value.trim();
+    const city=$("#ordCity").value.trim();
+    const pin=$("#ordPin").value.trim();
+    const notes=$("#ordNotes").value.trim();
+
+    if(!name){$("#ordError").textContent="Please enter your full name.";$("#ordName").focus();return;}
+    if(!phone||phone.length<10){$("#ordError").textContent="Please enter a valid 10-digit WhatsApp/phone number.";$("#ordPhone").focus();return;}
+    if(!address){$("#ordError").textContent="Please enter your complete delivery address.";$("#ordAddress").focus();return;}
+    if(!city){$("#ordError").textContent="Please enter your city/town.";$("#ordCity").focus();return;}
+    if(!pin||pin.length<6){$("#ordError").textContent="Please enter a valid 6-digit PIN code.";$("#ordPin").focus();return;}
+
+    $("#ordError").textContent="";
+
+    let total=0;
+    const itemsLines=cart.map(i=>{
+      const lt=priceFor(i.p,i.size)*i.q;
+      total+=lt;
+      return `• ${i.p.name} (${i.size}) × ${i.q} = ${rs(lt)}`;
+    }).join("\n");
+
+    const msg=[
+      `*NEW ORDER - SAVITRI CASHEWS*`,
+      `----------------------------------`,
+      `*Customer & Delivery Details:*`,
+      `👤 Name: ${name}`,
+      `📞 WhatsApp: ${phone}`,
+      `📍 Delivery Address: ${address}`,
+      `🏙️ City: ${city}`,
+      `📮 PIN Code: ${pin}`,
+      notes?`📝 Notes: ${notes}`:null,
+      `----------------------------------`,
+      `*Order Items:*`,
+      itemsLines,
+      `----------------------------------`,
+      `*Total Amount: ${rs(total)}*`,
+      `----------------------------------`,
+      `Please confirm my order and share payment details.`
+    ].filter(Boolean).join("\n");
+
+    const a=document.createElement("a");
+    a.href=waLink(msg);
+    a.target="_blank";
+    a.rel="noopener";
+    a.click();
+
+    closeOrderModal();
+    cart.length=0;
+    renderCart();
+    toast("Order details prepared! Opening WhatsApp...");
+  };
+}
+
 let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1800)}
 drawGrid();renderCart();
 
@@ -863,7 +1004,7 @@ const clEl=$("#gradeModalClose");
 if(clEl)clEl.addEventListener("click",closeGradeModal);
 const shopLinkEl=$("#gmShopBtn");
 if(shopLinkEl)shopLinkEl.addEventListener("click",closeGradeModal);
-addEventListener("keydown",e=>{if(e.key==="Escape")closeGradeModal();});
+addEventListener("keydown",e=>{if(e.key==="Escape"){closeGradeModal();closeOrderModal();}});
 $("#bars").innerHTML=NUTR.map(n=>`<div class="bar-row"><span>${n[0]}</span><div class="t"><i data-w="${n[3]}"></i></div><em>${n[1]} ${n[2]}</em></div>`).join("");
 
 /* ---------- misc UI ---------- */
